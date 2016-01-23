@@ -23,4 +23,4 @@ $ composer require amphp/aerys-reverse
 
 Now all requests to the webserver are reverse proxied to http://amphp.org/, with all the headers preserved and the Host header set to `amphp.org`.
 
-Alternatively one also can pass a callable as second parameter, hich then gets all the headers in and should return the headers to send.
+Alternatively one also can pass a callable as second parameter, which then gets all the headers in and should return the headers to send.

@@ -11,8 +11,10 @@ class Reverse implements Middleware {
 	private $client;
 
 	public function __construct(string $uri, $headers) {
+		$this->target = rtrim($uri, "/");
+
 		if (is_callable($headers)) {
-			/* okay */
+			$this->headers = $headers;
 		} elseif (is_array($headers)) {
 			foreach ($headers as $header => $values) {
 				if (!is_array($values)) {
@@ -24,12 +26,10 @@ class Reverse implements Middleware {
 					}
 				}
 			}
+			$this->headers = array_change_key_case($headers, CASE_LOWER);
 		} else {
 			throw new \UnexpectedValueException("Headers must be either callable or an array of arrays");
 		}
-
-		$this->target = rtrim($uri, "/");
-		$this->headers = array_change_key_case($headers, CASE_LOWER);
 
 		$this->client = new Client(new \Amp\Artax\Cookie\NullCookieJar);
 		$this->client->setAllOptions([
