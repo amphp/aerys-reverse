@@ -1,0 +1,28 @@
+{
+  "name": "amphp/aerys-reverse",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Bob Weinand",
+      "email": "bobwei9@hotmail.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/amphp/aerys-reverse/issues"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "amphp/amp": "^1",
+    "amphp/aerys": "dev-master",
+    "amphp/artax": "^2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.4.0",
+    "fabpot/php-cs-fixer": "~1.9"
+  },
+  "autoload": {
+    "classmap": [
+      {"Aerys\\Reverse": "Reverse.php"}
+    ]
+  }
+}
