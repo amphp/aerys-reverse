@@ -10,7 +10,7 @@ class Reverse implements Middleware {
 	private $headers;
 	private $client;
 
-	public function __construct(string $uri, $headers) {
+	public function __construct(string $uri, $headers = [], Client $client = null) {
 		$this->target = rtrim($uri, "/");
 
 		if (is_callable($headers)) {
@@ -31,24 +31,36 @@ class Reverse implements Middleware {
 			throw new \UnexpectedValueException("Headers must be either callable or an array of arrays");
 		}
 
-		$this->client = new Client(new \Amp\Artax\Cookie\NullCookieJar);
+		$this->client = $client ?? new Client(new \Amp\Artax\Cookie\NullCookieJar);
 		$this->client->setAllOptions([
-			Client::OP_DISCARD_BODY => true
+			Client::OP_DISCARD_BODY => true,
+			Client::OP_HOST_CONNECTION_LIMIT => INF,
 		]);
 	}
 
 	public function __invoke(Request $req, Response $res) {
-		if ($this->headers) {
-			if (is_callable($this->headers)) {
-				$headers = ($this->headers)($req->getAllHeaders());
-			} else {
-				$headers = $this->headers + $req->getAllHeaders();
+		$headers = $req->getAllHeaders();
+		unset($headers["accept-encoding"]);
+		$connection = $headers["connection"];
+		unset($headers["connection"])
+		foreach ($connection as $value) {
+			foreach (explode(",", strtolower($value)) as type) {
+				$type = trim($type);
+				if ($type == "upgrade") {
+					$headers["connection"][0] = "upgrade";
+				} else {
+					unset($headers[$type]);
+				}
 			}
-		} else {
-			$headers = $req->getAllHeaders();
 		}
 
-		unset($headers["accept-encoding"]);
+		if ($this->headers) {
+			if (is_callable($this->headers)) {
+				$headers = ($this->headers)($headers);
+			} else {
+				$headers = $this->headers + $headers;
+			}
+		}
 
 		$promise = $this->client->request((new \Amp\Artax\Request)
 			->setMethod($req->getMethod())
