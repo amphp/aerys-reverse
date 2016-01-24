@@ -6,6 +6,8 @@ use Amp\Artax\Client;
 use Amp\Artax\Notify;
 
 class Reverse implements Middleware {
+	const MAX_INTERMEDIARY_BUFFER = 64 * 1024;
+
 	private $target;
 	private $headers;
 	private $client;
@@ -161,6 +163,10 @@ class Reverse implements Middleware {
 				\Amp\disable($watcher);
 			}
 		}
+		if (\strlen($buffer) < self::MAX_INTERMEDIARY_BUFFER) {
+			\Amp\enable($info[1]);
+		}
+
 	}
 
 	public static function reader($watcher, $socket, $info) {
@@ -171,6 +177,9 @@ class Reverse implements Middleware {
 				\Amp\enable($info[1]);
 			}
 			$buffer .= $data;
+			if (\strlen($buffer) > self::MAX_INTERMEDIARY_BUFFER) {
+				\Amp\disable($watcher);
+			}
 		} elseif (!is_resource($socket) || @feof($socket)) {
 			\Amp\cancel($watcher);
 			if ($buffer == "") {
