@@ -44,9 +44,9 @@ class Reverse implements Middleware {
 		$headers = $req->getAllHeaders();
 		unset($headers["accept-encoding"]);
 		$connection = $headers["connection"];
-		unset($headers["connection"])
+		unset($headers["connection"]);
 		foreach ($connection as $value) {
-			foreach (explode(",", strtolower($value)) as type) {
+			foreach (explode(",", strtolower($value)) as $type) {
 				$type = trim($type);
 				if ($type == "upgrade") {
 					$headers["connection"][0] = "upgrade";
