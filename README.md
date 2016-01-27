@@ -18,7 +18,7 @@ $ composer require amphp/aerys-reverse
 ## Usage
 
 ```PHP
-(new Aerys\Host)->use(new Aerys\Reverse("http://amphp.org/", ["Host" => ["amphp.org"]]);
+(new Aerys\Host)->use(new Aerys\ReverseProxy("http://amphp.org/", ["Host" => ["amphp.org"]]);
 ```
 
 Now all requests to the webserver are reverse proxied to http://amphp.org/, with all the headers preserved and the Host header set to `amphp.org`.
