@@ -5,7 +5,7 @@ namespace Aerys;
 use Amp\Artax\Client;
 use Amp\Artax\Notify;
 
-class Reverse implements Middleware {
+class ReverseProxy implements Middleware {
 	const MAX_INTERMEDIARY_BUFFER = 64 * 1024;
 
 	private $target;
