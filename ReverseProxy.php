@@ -45,13 +45,15 @@ class ReverseProxy implements Middleware {
 		unset($headers["accept-encoding"]);
 		$connection = $headers["connection"];
 		unset($headers["connection"]);
-		foreach ($connection as $value) {
-			foreach (explode(",", strtolower($value)) as $type) {
-				$type = trim($type);
-				if ($type == "upgrade") {
-					$headers["connection"][0] = "upgrade";
-				} else {
-					unset($headers[$type]);
+		if (isset($connection)) {
+			foreach ($connection as $value) {
+				foreach (explode(",", strtolower($value)) as $type) {
+					$type = trim($type);
+					if ($type == "upgrade") {
+						$headers["connection"][0] = "upgrade";
+					} else {
+						unset($headers[$type]);
+					}
 				}
 			}
 		}
@@ -64,11 +66,16 @@ class ReverseProxy implements Middleware {
 			}
 		}
 
+		$bufferedBody = yield $req->getBody();
+		if ($bufferedBody === '') {
+			$bufferedBody = null;
+		}
+
 		$promise = $this->client->request((new \Amp\Artax\Request)
 			->setMethod($req->getMethod())
 			->setUri($this->target . $req->getUri())
 			->setAllHeaders($headers)
-			->setBody(yield $req->getBody())); // no async sending possible :-( [because of redirects]
+			->setBody($bufferedBody)); // no async sending possible :-( [because of redirects]
 
 		$promise->watch(function($update) use ($req, $res, &$hasBody, &$status, &$zlib) {
 			list($type, $data) = $update;
