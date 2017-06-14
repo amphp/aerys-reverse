@@ -22,7 +22,7 @@
   },
   "autoload": {
     "classmap": [
-      {"Aerys\\Reverse": "Reverse.php"}
+      {"Aerys\\ReverseProxy": "ReverseProxy.php"}
     ]
   }
 }
